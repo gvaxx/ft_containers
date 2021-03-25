@@ -14,21 +14,13 @@ namespace ft{
         ValueType&
     >
     {
-        FtIterator(void) {}
+    protected:
         ValueType*		 p;
+        FtIterator(void) {}
 
     public:
         FtIterator(ValueType* p) : p(p) {};
         FtIterator(const FtIterator &it) :p(it.p) {};
-
-        // bool operator!=(FtIterator const& other) const {return p != other.p;};
-        // bool operator==(FtIterator const& other) const {return p == other.p;};
-        // typename FtIterator::reference operator*() const {return *p;};
-        // FtIterator& operator++() {p++; return *this;};
-        // FtIterator& operator--() {p--; return *this;};
-        // FtIterator& operator->() {return p;};
-        // FtIterator& operator*() {return *p;};
-
         ~FtIterator(void) {}
 
 		FtIterator					&operator=(const FtIterator &rhs)
@@ -144,78 +136,75 @@ namespace ft{
 		}
 	};
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    template<class T>
-    class FtReverseIterator: public FtIterator<T>
+    template<typename ValueType>
+    class FtReverseIterator : public FtIterator<ValueType>
     {
     private:
-        FtReverseIterator(T *p);
+	    FtReverseIterator() {}
     public:
-        FtReverseIterator(const FtReverseIterator &it);
+	    FtReverseIterator(ValueType* p) {this->p = p;}
+        FtReverseIterator(const FtReverseIterator &it) {this->p = it.p;}
+        ~FtReverseIterator(void) {}
+		FtReverseIterator					&operator++(void)
+		{
+			this->p--;
+			return (*this);
+		}
 
-        bool operator!=(FtReverseIterator const& other) const;
-        bool operator==(FtReverseIterator const& other) const;
-        typename FtReverseIterator::reference operator*() const;
-        FtReverseIterator& operator++();
-        FtReverseIterator& operator--();
-    private:
-        T* p;
-    };
+		FtReverseIterator					operator++(int)
+		{
+			FtReverseIterator tmp = *this;
+			this->operator++();
+			return (tmp);
+		}
 
-    // template<typename ValueType>
-    // FtReverseIterator<ValueType>::FtReverseIterator(ValueType *p) :
-    //     p(p)
-    // {}
+		FtReverseIterator					&operator--(void)
+		{
+			this->p++;
+			return (*this);
+		}
 
-    // template<typename ValueType>
-    // FtReverseIterator<ValueType>::FtReverseIterator(const FtReverseIterator& it) :
-    //     p(it.p)
-    // {}
+		FtReverseIterator					operator--(int)
+		{
+			FtReverseIterator tmp = *this;
+			this->operator--();
+			return (tmp);
+		}
 
-    // template<typename ValueType>
-    // bool FtReverseIterator<ValueType>::operator!=(FtReverseIterator const& other) const
-    // {
-    //     return p != other.p;
-    // }
+		FtReverseIterator					operator+(int n) const
+		{
+			FtReverseIterator		iter(this->p - n);
+			return (iter);
+		}
 
-    // template<typename ValueType>
-    // bool FtReverseIterator<ValueType>::operator==(FtReverseIterator const& other) const
-    // {
-    //     return p == other.p;
-    // }
+		FtReverseIterator					operator-(int n) const
+		{
+			FtReverseIterator		iter(this->p + n);
+			return (iter);
+		}
 
-    // template<typename ValueType>
-    // typename FtReverseIterator<ValueType>::reference FtReverseIterator<ValueType>::operator*() const
-    // {
-    //     return *p;
-    // }
+		FtReverseIterator					&operator+=(int n)
+		{
+			this->p = this->p - n;
+			return (*this);
+		}
 
-    // template<typename ValueType>
-    // FtReverseIterator<ValueType> &FtReverseIterator<ValueType>::operator++()
-    // {
-    //     ++p;
-    //     return *this;
-    // }
+		FtReverseIterator					&operator-=(int n)
+		{
+			this->p = this->p + n;
+			return (*this);
+		}
 
-    // template<typename ValueType>
-    // FtReverseIterator<ValueType> &FtReverseIterator<ValueType>::operator--()
-    // {
-    //     --p;
-    //     return *this;
-    // }
+		ValueType					&operator[](int n) const
+		{
+			return (*(*this - n));
+		}
+
+		typename FtIterator<ValueType>::difference_type operator-(const FtReverseIterator rhs) const
+		{
+			return (this->p - rhs.p);
+		}
+	};
 }
 
 #endif // FTITERATOR_H

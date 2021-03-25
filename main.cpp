@@ -72,8 +72,10 @@ int main()
 	ft::FtVector<long> a;
 	std::vector<long> b;
 	std::vector<long> c;
-	srand(time(0));
+	ft::FtVector<long> d;
 
+	srand(time(0));
+	long r;
 	std::cout << "Empty							:";
 	check_values(a.empty(), b.empty());
 	for (int i = 0; i < 127; i++) {
@@ -81,7 +83,13 @@ int main()
 		a.push_back(r);
 		b.push_back(r);
 		c.push_back(r / 3);
+		d.push_back(r / 3);
 	}
+	
+	std::cout << "Reverse iterator					:";
+	b.assign(c.rbegin(), c.rend());
+	a.assign(d.rbegin(), d.rend());
+	check_vectors_size_and_value(a, b);
 
 	std::cout << "Erase value						:";
 	a.erase(a.begin() + 2);
@@ -107,7 +115,7 @@ int main()
 	check_vectors_size_and_value(a, b);
 
 	std::cout << "Insert one item at pos first				:";
-	long r = rand() / 13;
+	r = rand() / 13;
 	a.insert(a.begin(), r);
 	b.insert(b.begin(), r);
 
@@ -151,7 +159,6 @@ int main()
 	check_vectors_size_and_value(a, b);
 
 	std::cout << "Insert some items from other vector at end pos		:";
-
 	a.insert(a.end() - 11, c.begin(), c.begin() + 10);
 	b.insert(b.end() - 11, c.begin(), c.begin() + 10);
 
@@ -191,6 +198,23 @@ int main()
 	b.assign(154, r);
 	check_vectors_size_and_value(a, b);
 
+	std::cout << "Swap value						:";
+	c.assign(c.begin(), c.end());
+	d.assign(c.begin(), c.end());
+	swap(a, d);
+	swap(c, b);
+	check_vectors_size_and_value(a, b);
+
+	std::cout << "> operator						:";
+	check_values(b > c, a > d);
+	std::cout << "< operator						:";
+	check_values(b < c, a < d);
+	std::cout << "== operator						:";
+	check_values(b == c, a == d);
+	std::cout << "!= operator						:";
+	check_values(b != c, a != d);
+
+	// check_vectors_size_and_value(a, b);
 
 	// std::cout << "   vector: ";
 	// for (int i = 0; i < 5; i++)

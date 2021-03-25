@@ -60,6 +60,7 @@
 		"unordered_map": "cpp",
 		"utility": "cpp",
 		"vector": "cpp",
-		"hash_map": "cpp"
+		"hash_map": "cpp",
+		"memory_resource": "cpp"
 	}
 }

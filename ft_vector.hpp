@@ -5,6 +5,7 @@
 #include <typeinfo>
 #include <limits>
 #include "iterator.hpp"
+#include "helper.hpp"
 
 namespace ft {
 	template <class T >
@@ -19,8 +20,8 @@ namespace ft {
 		typedef	const value_type*						const_pointer;
 		typedef FtIterator<T>							iterator;
 		typedef const FtIterator<T>						const_iterator;
-		typedef FtReverseIterator<iterator>				reverse_iterator;
-		typedef FtReverseIterator<const_iterator>		const_reverse_iterator;
+		typedef FtReverseIterator<T>					reverse_iterator;
+		typedef FtReverseIterator<T>					const_reverse_iterator;
 
 		private:
 			value_type				*_array;
@@ -39,7 +40,7 @@ namespace ft {
 
 			explicit FtVector(size_type n, const value_type& val = value_type())
 			{
-				this->reserve(n);
+				reserve(n);
 				for (size_t i = 0; i < n; i++) {
 					new(&_array[i]) value_type(val);
 				}
@@ -86,9 +87,9 @@ namespace ft {
 
 			void clear()
 			{
-				for (size_type i = 0; i < this->_size; i++)
-					this->_array[i].value_type::~value_type();
-				this->_size = 0;
+				for (size_type i = 0; i < _size; i++)
+					_array[i].value_type::~value_type();
+				_size = 0;
 			}
 
 			size_type max_size() const
@@ -115,14 +116,44 @@ namespace ft {
 				}
 			}
 
-			iterator begin() const
+			iterator begin()
 			{
 				return iterator(&_array[0]);
 			}
 
-			iterator end() const
+			const_iterator begin() const
+			{
+				return iterator(&_array[0]);
+			}
+
+			iterator end()
 			{
 				return iterator(&_array[_size]);
+			}
+
+			const_iterator end() const
+			{
+				return iterator(&_array[_size]);
+			}
+
+			reverse_iterator rbegin()
+			{
+				return reverse_iterator(&_array[_size - 1]);
+			}
+
+			const_reverse_iterator rbegin() const
+			{
+				return const_reverse_iterator(&_array[_size - 1]);
+			}
+
+			reverse_iterator rend()
+			{
+				return reverse_iterator(&_array[-1]);
+			}
+
+			const_reverse_iterator rend() const
+			{
+				return const_reverse_iterator(&_array[-1]);
 			}
 
 			size_type capacity()
@@ -190,7 +221,7 @@ namespace ft {
 			void pop_back()
 			{
 				if (_size) {
-					this->_array[--_size].value_type::~value_type();
+					_array[--_size].value_type::~value_type();
 				}
 			}
 			iterator insert(iterator position, const value_type& val)
@@ -243,6 +274,13 @@ namespace ft {
 				__move_elems(last, first - last);
 				return first;
 			}
+
+			void swap (FtVector& x)
+			{
+				swap_value(x._array, _array);
+				swap_value(x._size, _size);
+				swap_value(x._capacity, _capacity);
+			}
 		private:
 			value_type *__reserve(size_type n)
 			{
@@ -286,6 +324,70 @@ namespace ft {
 				return distance;
 			}
 	};
+	template <class T>
+  	void swap (FtVector<T>& x, FtVector<T>& y)
+	{
+		x.swap(y);
+	}
+
+	template <class T>
+	bool operator==(const FtVector<T>& lhs, const FtVector<T>& rhs)
+	{
+		if (lhs.size() != rhs.size())
+			return false;
+		unsigned long size = lhs.size();
+		for (unsigned long i = 0; i < size; i++)
+			if (lhs[i] != rhs[i]) 
+				return false;
+		return true;
+	}
+
+	template <class T>
+	bool operator!=(const FtVector<T>& lhs, const FtVector<T>& rhs)
+	{
+		if (lhs.size() != rhs.size())
+			return true;
+		unsigned long size = lhs.size();
+		for (unsigned long i = 0; i < size; i++)
+			if (lhs[i] == rhs[i]) 
+				return false;
+		return true;
+	}
+
+	template <class T>
+	bool operator<(const FtVector<T>& lhs, const FtVector<T>& rhs)
+	{
+		unsigned long size = lhs.size();
+		if (size > rhs.size()) size = rhs.size();
+		for (unsigned long i = 0; i < size; i++)
+			if (lhs[i] != rhs[i])
+				return (lhs[i] < rhs[i]);
+		return lhs.size() < rhs.size();
+	
+	}
+
+	template <class T>
+	bool operator<=(const FtVector<T>& lhs, const FtVector<T>& rhs)
+	{
+		return (lhs < rhs || lhs == rhs);
+	}
+
+	template <class T>
+	bool operator>(const FtVector<T>& lhs, const FtVector<T>& rhs)
+	{
+		unsigned long size = lhs.size();
+		if (size > rhs.size()) size = rhs.size();
+		for (unsigned long i = 0; i < size; i++)
+			if (lhs[i] != rhs[i])
+				return (lhs[i] > rhs[i]);
+		return lhs.size() > rhs.size();
+	}
+
+	template <class T>
+	bool operator>=(const FtVector<T>& lhs, const FtVector<T>& rhs)
+	{
+		return (lhs > rhs || lhs == rhs);
+	}
 }
 
 #endif
