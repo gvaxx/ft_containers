@@ -1,45 +1,42 @@
 
-#include "ft_vector.hpp"
-#include <vector>
+#include "list.hpp"
+#include "helper.hpp"
+#include <list>
 #include <iostream>
+#include <sstream>
 #include <ctime>
 #include <cstdlib>
-#include <sstream>
 
-void print_error(std::string error_string)
-{
-	std::cerr << "\x1b[31m" << error_string << "\x1b[0m";
-}
-
-void print_success()
-{
-	std::cout << "\x1b[32m" << "[OK]" << "\x1b[0m" << std::endl;
-}
-
-void print_fail()
-{
-	std::cout << "\x1b[31m" << "[FAIL]" << "\x1b[0m" << std::endl;
-}
+void vector_test();
 
 template <class value >
-bool check_vectors_size_and_value(ft::FtVector<value> a, std::vector<value> b)
+bool check_list_size_and_value(ft::list<value> a, std::list<value> b)
 {
 	std::stringstream buffer;
-
 	try
 	{
 		if (a.size() != b.size()) {
-			buffer << "Vectors has different size\n" << "ft_vector: " << a.size() << std::endl << "   vector: " << b.size() << std::endl;
+			buffer << "Lists have different size\n" << "ft_list: " << a.size() << std::endl << "   list: " << b.size() << std::endl;
 			throw buffer.str();
 		}
-		size_t size = a.size();
+		typename ft::list<value>::iterator ft_beg = a.begin();
+		typename ft::list<value>::iterator ft_end = a.end();
+
+		typename std::list<value>::iterator beg = b.begin();
+		typename std::list<value>::iterator end = b.end();
 		size_t index = 0;
-		while (index < size) {
-			if (a[index] != b[index]) {
-				buffer << "Vectors has different value at index " << index << std::endl << "ft_vector: " << a[index] << std::endl << "   vector: " << b[index] << std::endl;
+		while (ft_beg != ft_end || beg != end) {
+			if (*ft_beg != *beg) {
+				buffer << "Lists have different value in node " << index << std::endl << "ft_list: " << *ft_beg << std::endl << "   list: " << *beg << std::endl;
 				throw buffer.str();
 			}
+			ft_beg++;
+			beg++;
 			index++;
+		}
+		if (ft_beg != ft_end || beg != end) {
+			buffer << "Lists have length" << std::endl;
+			throw buffer.str();
 		}
 	}
 	catch(std::string err)
@@ -52,7 +49,6 @@ bool check_vectors_size_and_value(ft::FtVector<value> a, std::vector<value> b)
 	return true;
 }
 
-
 template <class value >
 bool check_values(value a, value b)
 {
@@ -62,175 +58,63 @@ bool check_values(value a, value b)
 	}
 	print_fail();
 	std::stringstream buffer;
-	buffer << "Vectors has different value " << std::endl << "ft_vector: " << a << std::endl << "   vector: " << b << std::endl;
+	buffer << "Lists has different value " << std::endl << "ft_list: " << a << std::endl << "   list: " << b << std::endl;
 	print_error(buffer.str());
 	return false;
 }
 
-int main()
+void list_test()
 {
-	ft::FtVector<long> a;
-	std::vector<long> b;
-	std::vector<long> c;
-	ft::FtVector<long> d;
-
-	srand(time(0));
+	size_t i = 100;
+	long t = 130;
 	long r;
-	std::cout << "Empty							:";
-	check_values(a.empty(), b.empty());
+	ft::list<long> a(i, t);
+	std::list<long> b(i, t);
+	std::cout << "Check create with default value	:";
+	check_list_size_and_value(a, b);
+	ft::list<long> c;
+	std::list<long> d;
+
+	std::cout << "Empty				:";
+	check_values(c.empty(), d.empty());
 	for (int i = 0; i < 127; i++) {
-		long r = rand() / 13;
+		r = rand() / 13;
 		a.push_back(r);
 		b.push_back(r);
-		c.push_back(r / 3);
-		d.push_back(r / 3);
+		c.push_front(r / 3);
+		d.push_front(r / 3);
 	}
-	
-	std::cout << "Reverse iterator					:";
-	b.assign(c.rbegin(), c.rend());
-	a.assign(d.rbegin(), d.rend());
-	check_vectors_size_and_value(a, b);
+	std::cout << "Check for early full lists	:";
+	check_list_size_and_value(a, b);
+	std::cout << "Check for early empty lists	:";
+	check_list_size_and_value(c, d);
+	for (int i = 0; i < 3; i++) {
+		a.pop_back();
+		b.pop_back();
+		c.pop_front();
+		d.pop_front();
+	}
+	std::cout << "Pop back			:";
+	check_list_size_and_value(a, b);
+	std::cout << "Pop front			:";
+	check_list_size_and_value(c, d);
 
-	std::cout << "Erase value						:";
-	a.erase(a.begin() + 2);
-	b.erase(b.begin() + 2);
-	check_vectors_size_and_value(a, b);
-
-
-	std::cout << "Erase iterator						:";
-	a.erase(a.begin() + 2, a.begin() + 6);
-	b.erase(b.begin() + 2, b.begin() + 6);
-	check_vectors_size_and_value(a, b);
-
-	std::cout << "Push back						:";
-	check_vectors_size_and_value(a, b);
-
-	std::cout << "Front							:";
+	std::cout << "Front				:";
 	check_values(a.front(), b.front());
+	std::cout << "Back				:";
+	check_values(c.back(), d.back());
+}
 
-	std::cout << "Back							:";
-	check_values(a.back(), b.back());
-
-	std::cout << "Pop back						:";
-	check_vectors_size_and_value(a, b);
-
-	std::cout << "Insert one item at pos first				:";
-	r = rand() / 13;
-	a.insert(a.begin(), r);
-	b.insert(b.begin(), r);
-
-	a.insert(a.begin(), r);
-	b.insert(b.begin(), r);
-
-	a.insert(a.begin(), r);
-	b.insert(b.begin(), r);
-	check_vectors_size_and_value(a, b);
-
-	std::cout << "Insert one item at last pos				:";
-	r = rand() / 13;
-	a.insert(a.end() - 1, r);
-	b.insert(b.end() - 1, r);
-
-	a.insert(a.end() - 1, r);
-	b.insert(b.end() - 1, r);
-
-	a.insert(a.end() - 1, r);
-	b.insert(b.end() - 1, r);
-	check_vectors_size_and_value(a, b);
-
-	std::cout << "Insert some items at first pos				:";
-	r = rand() / 13;
-	a.insert(a.begin(), 10, r);
-	b.insert(b.begin(), 10, r);
-
-	check_vectors_size_and_value(a, b);
-
-	std::cout << "Insert some items at end pos				:";
-	r = rand() / 13;
-	a.insert(a.begin(), 10, r);
-	b.insert(b.begin(), 10, r);
-
-	check_vectors_size_and_value(a, b);
-
-
-	std::cout << "Insert some items from other vector at start pos	:";
-	a.insert(a.begin(), c.begin(), c.begin() + 10);
-	b.insert(b.begin(), c.begin(), c.begin() + 10);
-	check_vectors_size_and_value(a, b);
-
-	std::cout << "Insert some items from other vector at end pos		:";
-	a.insert(a.end() - 11, c.begin(), c.begin() + 10);
-	b.insert(b.end() - 11, c.begin(), c.begin() + 10);
-
-	check_vectors_size_and_value(a, b);
-
-	std::cout << "Reserve 2000						:";
-
-	a.reserve(2000);
-	b.reserve(2000);
-	check_values(a.capacity(), b.capacity());
-
-	std::cout << "vector[3]						:";
-	check_values(a[3], b[3]);
-
-	std::cout << "vector.at(8)						:";
-	check_values(a.at(8), b.at(8));
-
-	std::cout << "Clear							:";
-	a.clear();
-	b.clear();
-	check_vectors_size_and_value(a, b);
-
-	std::cout << "Max size						:";
-	check_values(a.max_size(), b.max_size());
-
-	std::cout << "Assign iterator						:";
-	a.assign(c.begin(), c.begin() + 10);
-	b.assign(c.begin(), c.begin() + 10);
-
-	a.assign(c.begin() + 3, c.begin() + 5);
-	b.assign(c.begin() + 3, c.begin() + 5);
-	check_vectors_size_and_value(a, b);
-
-	std::cout << "Assign value						:";
-	r = rand() / 13;
-	a.assign(154, r);
-	b.assign(154, r);
-	check_vectors_size_and_value(a, b);
-
-	std::cout << "Swap value						:";
-	c.assign(c.begin(), c.end());
-	d.assign(c.begin(), c.end());
-	swap(a, d);
-	swap(c, b);
-	check_vectors_size_and_value(a, b);
-
-	std::cout << "> operator						:";
-	check_values(b > c, a > d);
-	std::cout << "< operator						:";
-	check_values(b < c, a < d);
-	std::cout << "== operator						:";
-	check_values(b == c, a == d);
-	std::cout << "!= operator						:";
-	check_values(b != c, a != d);
-
-	// check_vectors_size_and_value(a, b);
-
-	// std::cout << "   vector: ";
-	// for (int i = 0; i < 5; i++)
-	// 	std::cout << *(b.begin() + i) << std::endl;
-	// std::cout << "(after insert)" << std::endl;
-	
-	// std::cout << "___________insert iter_________" << std::endl;
-
-	// std::cout << "ft_vector: " << *(a.end() - 1) << std::endl;
-	// std::cout << "   vector: " << *(a.end() - 1) << std::endl;
-
-	// std::cout << "___________max size____________" << std::endl;
-
-	// std::cout << "ft_vector: " << a.max_size() << std::endl;
-	// std::cout << "   vector: " << b.max_size() << std::endl;
-
-	// std::cout << a.max_size() << std::endl;
-	// std::cout << a.max_size() << std::endl;
+int main()
+{
+	srand(time(0));
+	// vector_test();
+	list_test();
+	// std::list<long> b;
+	// std::cout << b.size() << std::endl;
+	// std::cout << (b.begin() == b.end()) << std::endl;
+	// std::cout << *(b.begin()) << std::endl;
+	// b.insert(b.end(), 5);
+	// std::cout << b.size() << std::endl;
+	// std::cout << *(b.begin()) << std::endl;
 }

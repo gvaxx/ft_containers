@@ -4,24 +4,24 @@
 #include <iostream>
 #include <typeinfo>
 #include <limits>
-#include "iterator.hpp"
+#include "random_access_iterator.hpp"
 #include "helper.hpp"
 
 namespace ft {
 	template <class T >
-	class FtVector {
+	class vector {
 	public:
 		typedef T										value_type;
-		typedef unsigned long							size_type;
+		typedef std::size_t								size_type;
 		typedef std::ptrdiff_t							difference_type;
 		typedef	value_type&								reference;
 		typedef	const value_type&						const_reference;
 		typedef	value_type*								pointer;
 		typedef	const value_type*						const_pointer;
-		typedef FtIterator<T>							iterator;
-		typedef const FtIterator<T>						const_iterator;
-		typedef FtReverseIterator<T>					reverse_iterator;
-		typedef FtReverseIterator<T>					const_reverse_iterator;
+		typedef RandomAccessIterator<T>					iterator;
+		typedef const RandomAccessIterator<T>			const_iterator;
+		typedef RandomAccessReverseIterator<T>			reverse_iterator;
+		typedef const RandomAccessReverseIterator<T>	const_reverse_iterator;
 
 		private:
 			value_type				*_array;
@@ -29,16 +29,16 @@ namespace ft {
 			size_type				_capacity;
 			
 		public:
-			explicit FtVector(): _array(NULL), _size(0), _capacity(0)
+			explicit vector(): _array(NULL), _size(0), _capacity(0)
 			{}
 
-			~FtVector()
+			~vector()
 			{
 				clear();
 				::operator delete(_array);
 			}
 
-			explicit FtVector(size_type n, const value_type& val = value_type())
+			explicit vector(size_type n, const value_type& val = value_type())
 			{
 				reserve(n);
 				for (size_t i = 0; i < n; i++) {
@@ -47,13 +47,13 @@ namespace ft {
 			}
 
 			template <class InputIterator>
-			FtVector(InputIterator first, InputIterator last)
+			vector(InputIterator first, InputIterator last)
 			{
 				for (; first != last; ++first)
 					push_back(*first);
 			}
 
-			FtVector(const FtVector& x): _array(NULL), _size(0), _capacity(0)
+			vector(const vector& x): _array(NULL), _size(0), _capacity(0)
 			{
 				if (x.size())
 				{
@@ -65,7 +65,7 @@ namespace ft {
 				}
 			}
 
-			FtVector& operator=(const FtVector& x)
+			vector& operator=(const vector& x)
 			{
 				if (this != &x)
 				{
@@ -275,7 +275,7 @@ namespace ft {
 				return first;
 			}
 
-			void swap (FtVector& x)
+			void swap (vector& x)
 			{
 				swap_value(x._array, _array);
 				swap_value(x._size, _size);
@@ -325,13 +325,13 @@ namespace ft {
 			}
 	};
 	template <class T>
-  	void swap (FtVector<T>& x, FtVector<T>& y)
+  	void swap (vector<T>& x, vector<T>& y)
 	{
 		x.swap(y);
 	}
 
 	template <class T>
-	bool operator==(const FtVector<T>& lhs, const FtVector<T>& rhs)
+	bool operator==(const vector<T>& lhs, const vector<T>& rhs)
 	{
 		if (lhs.size() != rhs.size())
 			return false;
@@ -343,7 +343,7 @@ namespace ft {
 	}
 
 	template <class T>
-	bool operator!=(const FtVector<T>& lhs, const FtVector<T>& rhs)
+	bool operator!=(const vector<T>& lhs, const vector<T>& rhs)
 	{
 		if (lhs.size() != rhs.size())
 			return true;
@@ -355,7 +355,7 @@ namespace ft {
 	}
 
 	template <class T>
-	bool operator<(const FtVector<T>& lhs, const FtVector<T>& rhs)
+	bool operator<(const vector<T>& lhs, const vector<T>& rhs)
 	{
 		unsigned long size = lhs.size();
 		if (size > rhs.size()) size = rhs.size();
@@ -367,13 +367,13 @@ namespace ft {
 	}
 
 	template <class T>
-	bool operator<=(const FtVector<T>& lhs, const FtVector<T>& rhs)
+	bool operator<=(const vector<T>& lhs, const vector<T>& rhs)
 	{
 		return (lhs < rhs || lhs == rhs);
 	}
 
 	template <class T>
-	bool operator>(const FtVector<T>& lhs, const FtVector<T>& rhs)
+	bool operator>(const vector<T>& lhs, const vector<T>& rhs)
 	{
 		unsigned long size = lhs.size();
 		if (size > rhs.size()) size = rhs.size();
@@ -384,7 +384,7 @@ namespace ft {
 	}
 
 	template <class T>
-	bool operator>=(const FtVector<T>& lhs, const FtVector<T>& rhs)
+	bool operator>=(const vector<T>& lhs, const vector<T>& rhs)
 	{
 		return (lhs > rhs || lhs == rhs);
 	}

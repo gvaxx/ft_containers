@@ -61,6 +61,8 @@
 		"utility": "cpp",
 		"vector": "cpp",
 		"hash_map": "cpp",
-		"memory_resource": "cpp"
+		"memory_resource": "cpp",
+		"list": "cpp",
+		"__cxx_version": "cpp"
 	}
 }
