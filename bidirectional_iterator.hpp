@@ -2,6 +2,7 @@
 #define BIDERECTIONAL_H
 
 #include <iterator>
+#include "list.hpp"
 
 namespace ft{
     template<typename ValueType>
@@ -13,6 +14,8 @@ namespace ft{
         ValueType&
     >
     {
+	    template<class> friend class list;
+
     protected:
         Node<ValueType>*		 p;
 

@@ -26,8 +26,8 @@ namespace ft {
 		private:
 		typedef Node<T>									__node;
 		typedef __node*									__node_pointer;
-			__node_pointer			_end;
-			size_type				_size;
+		__node_pointer									_end;
+		size_type										_size;
 			
 		public:
 			explicit list()
@@ -215,14 +215,11 @@ namespace ft {
 				__destroy_node(first_node);
 				_size--;
 			}
-/*
+
 			iterator insert(iterator position, const value_type& val)
 			{
-				__node_pointer *insert_node = _head;
-				if (_size)
-					insert_node = __insert_node_before_el(position.getNode(), val);
-				else
-					_head->value = val;
+				__node_pointer insert_node = __create_node(val);
+				__link_nodes(position.getNode(), insert_node, insert_node);
 				_size++;
 				return iterator(insert_node);
 			}
@@ -230,57 +227,81 @@ namespace ft {
 			void insert (iterator position, size_type n, const value_type& val)
 			{
 				if (n) {
-					__node_pointer *insert_node;
-					if (_size) {
-						for (size_type i = 0; i < n, i++) {
-							__insert_node_before_el(position.getNode(), val)
-							_size++;
-						}
-					} else {
-						_head->value = val;
-						n--;
-						_size++;
+					__node_pointer first_node, last_node;
+					first_node = last_node = __create_node(val) ;
+					for (size_type i = 1; i < n; i++) {
+						last_node->next = __create_node(val);
+						last_node->next->prev = last_node;
+						last_node = last_node->next;
 					}
-				}
-				size_type index = position - begin();
-				__move_elems(position, n);
-				for (size_type i = 0; i < n; i++) {
-					_array[index + i] = val;
+					__link_nodes(position.getNode(), first_node, last_node);
 				}
 			}
 			template <class InputIterator>
 			void insert (iterator position, InputIterator first, InputIterator last)
 			{
-				size_type index = position - begin();
-				size_type quantity = __distance(first, last);
-				__move_elems(position, quantity);
-				while (first != last) {
-					_array[index++] = *first;
-					first++;
+				if (first != last) {
+					__node_pointer first_node, last_node;
+					first_node = last_node = __create_node(*first) ;
+					for (++first; first != last; first++) {
+						last_node->next = __create_node(*first);
+						last_node->next->prev = last_node;
+						last_node = last_node->next;
+					}
+					__link_nodes(position.getNode(), first_node, last_node);
 				}
 			}
+			
+
 			template <class InputIterator>
 			void assign(InputIterator first, InputIterator last)
 			{
-				clear();
-				insert(begin(), first, last);
+				iterator index = begin();
+				iterator end = end();
+				for (; first != last && index != end; ++first, ++index)
+					*index = *first;
+				if (index == end)
+					insert(end, first, last);
+				else
+					erase(index, end);
 			}
 
 			void assign(size_type n, const value_type& val)
 			{
-				clear();
-				insert(begin(), n, val);
+				iterator index = begin();
+				iterator end = end();
+				for (; n > 0 && index != end; --n, ++index)
+					*index = val;
+				if (index == end)
+					insert(end, n, val);
+				else
+					erase(index, end);
 			}
+
 			iterator erase (iterator position)
-			{
-				__move_elems(position + 1, -1);
-				return position;
+			{				
+				__node_pointer delete_node = position.getNode();
+				iterator return_iterator = iterator(delete_node->next);
+				__unlink_nodes(delete_node, delete_node);
+				__destroy_node(delete_node);
+				_size--;
+				return return_iterator;
 			}
+
 			iterator erase (iterator first, iterator last)
 			{
-				__move_elems(last, first - last);
-				return first;
+				iterator return_iterator = iterator(last.getNode());
+				__unlink_nodes(first.getNode(), (last.getNode())->prev);
+				while (first != last)
+				{
+					__node_pointer delete_node = first.getNode();
+					++first;
+					--_size;
+					__destroy_node(delete_node);
+				}
+				return return_iterator;
 			}
+/*
 
 			void swap (list& x)
 			{

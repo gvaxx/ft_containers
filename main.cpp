@@ -103,6 +103,34 @@ void list_test()
 	check_values(a.front(), b.front());
 	std::cout << "Back				:";
 	check_values(c.back(), d.back());
+	for (int i = 0; i < 3; i++) {
+		r = rand() / 13;
+		a.insert(a.begin(), r);
+		b.insert(b.begin(), r);
+		c.insert(c.end(), r);
+		d.insert(d.end(), r);
+	}
+	std::cout << "Check for early full lists	:";
+	check_list_size_and_value(a, b);
+	std::cout << "Check for early empty lists	:";
+	check_list_size_and_value(c, d);
+	std::cout << "Check for early full lists	:";
+	a.insert(++a.begin(), i, t);
+	b.insert(++b.begin(), i, t);
+	check_list_size_and_value(a, b);
+
+	std::cout << "Check for early full lists	:";
+	c.insert(++c.begin(), c.begin(), c.end());
+	d.insert(++d.begin(), d.begin(), d.end());
+	check_list_size_and_value(a, b);
+	std::cout << "Erase				:";
+	a.erase(++a.begin());
+	b.erase(++b.begin());
+	check_list_size_and_value(a, b);
+	std::cout << "Erase some iterator		:";
+	c.erase(c.begin(), c.end());
+	d.erase(d.begin(), d.end());
+	check_list_size_and_value(a, b);
 }
 
 int main()
@@ -110,11 +138,8 @@ int main()
 	srand(time(0));
 	// vector_test();
 	list_test();
-	// std::list<long> b;
+	// std::list<long> b(10, 13);
 	// std::cout << b.size() << std::endl;
-	// std::cout << (b.begin() == b.end()) << std::endl;
-	// std::cout << *(b.begin()) << std::endl;
-	// b.insert(b.end(), 5);
+	// b.assign(++b.begin(), b.end());
 	// std::cout << b.size() << std::endl;
-	// std::cout << *(b.begin()) << std::endl;
 }
