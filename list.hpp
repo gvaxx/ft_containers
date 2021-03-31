@@ -26,8 +26,8 @@ namespace ft {
 		private:
 		typedef Node<T>									__node;
 		typedef __node*									__node_pointer;
-		__node_pointer									_end;
-		size_type										_size;
+		__node_pointer									__end;
+		size_type										__size;
 			
 		public:
 			explicit list()
@@ -54,7 +54,7 @@ namespace ft {
 				__base_construct();
 				while (first != last) {
 					push_back(*first);
-					_size++;
+					__size++;
 				}
 			}
 
@@ -71,7 +71,7 @@ namespace ft {
 
 			size_type size() const
 			{
-				return _size;
+				return __size;
 			}
 
 			list& operator=(const list& x)
@@ -90,81 +90,81 @@ namespace ft {
 			void push_back(const value_type& val)
 			{
 				__node_pointer tmp = __create_node(val);
-				__link_nodes(_end, tmp, tmp);
-				_size++;
+				__link_nodes(__end, tmp, tmp);
+				__size++;
 			}
 
 			void push_front(const value_type& val)
 			{
 				__node_pointer tmp = __create_node(val);
-				__link_nodes(_end->next, tmp, tmp);
-				_size++;
+				__link_nodes(__end->next, tmp, tmp);
+				__size++;
 			}
 
 			void clear()
 			{
-				__node_pointer first_node = _end->next;
+				__node_pointer first_node = __end->next;
 				__node_pointer tmp = first_node;
-				while (first_node != _end) {
+				while (first_node != __end) {
 					tmp = first_node;
 					first_node = first_node->next;
 					__destroy_node(tmp);
 				}
-				__destroy_node(_end);
+				__destroy_node(__end);
 				__base_construct();
 			}
 
-			size_type max_size() const
+			size_type max__size() const
 			{
 				return std::numeric_limits<difference_type>::max();
 			}
 
 			iterator begin()
 			{
-				return iterator(_end->next);
+				return iterator(__end->next);
 			}
 
 			const_iterator begin() const
 			{
-				return const_iterator(_end->next);
+				return const_iterator(__end->next);
 			}
 
 			iterator end()
 			{
-				return iterator(_end);
+				return iterator(__end);
 			}
 
 			const_iterator end() const
 			{
-				return const_iterator(_end);
+				return const_iterator(__end);
 			}
 
 			reverse_iterator rbegin()
 			{
-				return reverse_iterator(_end->prev);
+				return reverse_iterator(__end->prev);
 			}
 
 			const_reverse_iterator rbegin() const
 			{
-				return const_reverse_iterator(_end->prev);
+				return const_reverse_iterator(__end->prev);
 			}
 
 			reverse_iterator rend()
 			{
-				return reverse_iterator(_end);
+				return reverse_iterator(__end);
 			}
 
 			const_reverse_iterator rend() const
 			{
-				return const_reverse_iterator(_end);
+				return const_reverse_iterator(__end);
 			}
 
 			// void resize(size_type n, value_type val = value_type())
 			// {
-			// 	while(n > _size)
+			// 	while(n > __size)
 			// 		push_back(val);
-			// 	if (n < _size) {
-			// 		size_type tmp = _size;
+			// 	if (n < __size) {
+			// 		size_type tmp = __size;
 			// 		_capacity = 1;
 			// 		reserve(n);
 			// 	}
@@ -173,54 +173,54 @@ namespace ft {
 
 			bool empty() const
 			{
-				return !_size;
+				return !__size;
 			}
 
 			reference front()
 			{
-				return _end->next->value;
+				return __end->next->value;
 			}
 
 			const_reference front() const
 			{
-				return _end->next->value;
+				return __end->next->value;
 			}
 
 			reference back()
 			{
-				return _end->prev->value;
+				return __end->prev->value;
 			}
 
 			const_reference back() const
 			{
-				return _end->prev->value;
+				return __end->prev->value;
 			}
 
 			void pop_back()
 			{
 				if (empty())
 					return ;
-				__node_pointer last_node = _end->prev;
+				__node_pointer last_node = __end->prev;
 				__unlink_nodes(last_node, last_node);
 				__destroy_node(last_node);
-				_size--;
+				__size--;
 			}
 
 			void pop_front()
 			{
 				if (empty())
 					return ;
-				__node_pointer first_node = _end->next;
+				__node_pointer first_node = __end->next;
 				__unlink_nodes(first_node, first_node);
 				__destroy_node(first_node);
-				_size--;
+				__size--;
 			}
 
 			iterator insert(iterator position, const value_type& val)
 			{
 				__node_pointer insert_node = __create_node(val);
 				__link_nodes(position.getNode(), insert_node, insert_node);
-				_size++;
+				__size++;
 				return iterator(insert_node);
 			}
 
@@ -284,7 +284,7 @@ namespace ft {
 				iterator return_iterator = iterator(delete_node->next);
 				__unlink_nodes(delete_node, delete_node);
 				__destroy_node(delete_node);
-				_size--;
+				__size--;
 				return return_iterator;
 			}
 
@@ -296,17 +296,92 @@ namespace ft {
 				{
 					__node_pointer delete_node = first.getNode();
 					++first;
-					--_size;
+					--__size;
 					__destroy_node(delete_node);
 				}
 				return return_iterator;
+			}
+
+			void splice(iterator position, list& x)
+			{
+				if (!x.empty())
+				{
+					__node_pointer first = x.__end->next;
+					__node_pointer last = x.__end->prev;
+					__unlink_nodes(first, last);
+					__link_nodes(position.getNode(), first, last);
+					__size += x.size();
+					x.__size = 0;
+				}
+			}
+			void splice (iterator position, list& x, iterator i)
+			{
+				__node_pointer node_pos = position.getNode();
+				if (node_pos != i.getNode() && node_pos != (i.getNode())->next)
+				{
+					__node_pointer first = i.getNode();
+					__unlink_nodes(first, first);
+					__link_nodes(node_pos, first, first);
+					--x.__size;
+					++__size;
+				}
+			}
+
+			void splice (iterator position, list& x, iterator first, iterator last)
+			{
+				if (first != last)
+				{
+					__node_pointer first_node = first.getNode();
+					__node_pointer last_node = (last.getNode())->prev;
+					if (this != &x)
+					{
+						size_type distance = __distance(first, last);
+						x.__size -= distance;
+						__size += distance;
+					}
+					__unlink_nodes(first_node, last_node);
+					__link_nodes(position.getNode(), first_node, last_node);
+				}
+			}
+
+			void remove (const value_type& val)
+			{
+				if (__size)
+				{
+					iterator	first = begin() ;
+					iterator	last = end();
+					iterator	tmp;
+					while (first != last)
+					{
+						tmp = first++;
+						if (*tmp == val)
+							this->erase(tmp);
+					}
+				}
+			}
+
+			template <class Predicate>
+			void remove_if (Predicate pred)
+			{
+				if (__size)
+				{
+					iterator	first = begin() ;
+					iterator	last = end();
+					iterator	tmp;
+					while (first != last)
+					{
+						tmp = first++;
+						if (pred(*tmp))
+							this->erase(tmp);
+					}
+				}
 			}
 /*
 
 			void swap (list& x)
 			{
 				swap_value(x._array, _array);
-				swap_value(x._size, _size);
+				swap_value(x.__size, __size);
 				swap_value(x._capacity, _capacity);
 			}*/
 		private:
@@ -330,10 +405,10 @@ namespace ft {
 
 			void __base_construct()
 			{
-				_end = __create_node();
-				_end->next = _end;
-				_end->prev = _end;
-				_size = 0;
+				__end = __create_node();
+				__end->next = __end;
+				__end->prev = __end;
+				__size = 0;
 			}
 
 			__node_pointer __create_node(T value = value_type())

@@ -62,7 +62,13 @@ bool check_values(value a, value b)
 	print_error(buffer.str());
 	return false;
 }
-
+template <class value >
+void show_value(ft::list<value> a)
+{
+	typename ft::list<value>::iterator it = a.begin();
+	while (it != a.end())
+		std::cout << *(it++) << std::endl;
+}
 void list_test()
 {
 	size_t i = 100;
@@ -123,6 +129,15 @@ void list_test()
 	c.insert(++c.begin(), c.begin(), c.end());
 	d.insert(++d.begin(), d.begin(), d.end());
 	check_list_size_and_value(a, b);
+	std::cout << "Remove				:";
+	a.remove(130);
+	b.remove(130);
+	check_list_size_and_value(a, b);
+	// show_value(a);
+	std::cout << "Splice all			:";
+	a.splice(++a.begin(), c);
+	b.splice(++b.begin(), d);
+	check_list_size_and_value(a, b);
 	std::cout << "Erase				:";
 	a.erase(++a.begin());
 	b.erase(++b.begin());
@@ -130,7 +145,7 @@ void list_test()
 	std::cout << "Erase some iterator		:";
 	c.erase(c.begin(), c.end());
 	d.erase(d.begin(), d.end());
-	check_list_size_and_value(a, b);
+	check_list_size_and_value(c, d);
 }
 
 int main()
