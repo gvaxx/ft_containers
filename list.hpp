@@ -22,10 +22,10 @@ namespace ft {
 		typedef const BidirectionalIterator<T>			const_iterator;
 		typedef BidirectionalReverseIterator<T>			reverse_iterator;
 		typedef const BidirectionalReverseIterator<T>	const_reverse_iterator;
-
-		private:
 		typedef Node<T>									__node;
 		typedef __node*									__node_pointer;
+
+		private:
 		__node_pointer									__end;
 		size_type										__size;
 			
@@ -67,9 +67,15 @@ namespace ft {
 					for (; first != last; first++)
 						push_back(*first);
 				}
+				__size = x.__size;
 			}
 
 			size_type size() const
+			{
+				return __size;
+			}
+
+			size_type size()
 			{
 				return __size;
 			}
@@ -114,7 +120,7 @@ namespace ft {
 				__base_construct();
 			}
 
-			size_type max__size() const
+			size_type max_size() const
 			{
 				return std::numeric_limits<difference_type>::max();
 			}
@@ -159,17 +165,13 @@ namespace ft {
 				return const_reverse_iterator(__end);
 			}
 
-			// void resize(size_type n, value_type val = value_type())
-			// {
-			// 	while(n > __size)
-			// 		push_back(val);
-			// 	if (n < __size) {
-			// 		size_type tmp = __size;
-			// 		_capacity = 1;
-			// 		reserve(n);
-			// 	}
-			// 	return ;
-			// }
+			void resize(size_type n, value_type val = value_type())
+			{
+				if (n < __size)
+					erase(__iterator(n), end());
+				else if (n > __size)
+					insert(end(), n - __size, val);
+			}
 
 			bool empty() const
 			{
@@ -224,7 +226,7 @@ namespace ft {
 				return iterator(insert_node);
 			}
 
-			void insert (iterator position, size_type n, const value_type& val)
+			void insert(iterator position, size_type n, const value_type& val)
 			{
 				if (n) {
 					__node_pointer first_node, last_node;
@@ -234,6 +236,7 @@ namespace ft {
 						last_node->next->prev = last_node;
 						last_node = last_node->next;
 					}
+					__size += n;
 					__link_nodes(position.getNode(), first_node, last_node);
 				}
 			}
@@ -243,10 +246,12 @@ namespace ft {
 				if (first != last) {
 					__node_pointer first_node, last_node;
 					first_node = last_node = __create_node(*first) ;
+					__size++;
 					for (++first; first != last; first++) {
 						last_node->next = __create_node(*first);
 						last_node->next->prev = last_node;
 						last_node = last_node->next;
+						__size++;
 					}
 					__link_nodes(position.getNode(), first_node, last_node);
 				}
@@ -292,6 +297,7 @@ namespace ft {
 			{
 				iterator return_iterator = iterator(last.getNode());
 				__unlink_nodes(first.getNode(), (last.getNode())->prev);
+				
 				while (first != last)
 				{
 					__node_pointer delete_node = first.getNode();
@@ -299,6 +305,7 @@ namespace ft {
 					--__size;
 					__destroy_node(delete_node);
 				}
+
 				return return_iterator;
 			}
 
@@ -376,14 +383,33 @@ namespace ft {
 					}
 				}
 			}
-/*
 
 			void swap (list& x)
 			{
-				swap_value(x._array, _array);
+				swap_value(x.__end, __end);
 				swap_value(x.__size, __size);
-				swap_value(x._capacity, _capacity);
-			}*/
+			}
+
+			void unique()
+			{
+				unique(10);
+			}
+
+			template <class BinaryPredicate>
+			void unique(BinaryPredicate binary_pred)
+			{
+				iterator start = begin();
+				iterator next = start;
+				for (iterator back = end(); start != back;)
+				{
+					next++;
+					for (; next != back && *start == *next; next++);
+					if (++start != next) {
+						erase(start, next);
+						start = next;
+					}
+				}
+			}
 		private:
 			__node_pointer *__insert_node_before_el(__node_pointer *el, const value_type& val = value_type())
 			{
@@ -437,6 +463,14 @@ namespace ft {
 			{
 				node->value.value_type::~value_type();
 				node->__node::~__node();
+			}
+
+			iterator	__iterator(size_type n)
+			{
+				iterator start = begin();
+				for (size_type i = 0; i < n; i++)
+					start++;
+				return start;
 			}
 	};
 

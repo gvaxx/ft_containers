@@ -90,6 +90,7 @@ void list_test()
 		c.push_front(r / 3);
 		d.push_front(r / 3);
 	}
+
 	std::cout << "Check for early full lists	:";
 	check_list_size_and_value(a, b);
 	std::cout << "Check for early empty lists	:";
@@ -116,6 +117,7 @@ void list_test()
 		c.insert(c.end(), r);
 		d.insert(d.end(), r);
 	}
+
 	std::cout << "Check for early full lists	:";
 	check_list_size_and_value(a, b);
 	std::cout << "Check for early empty lists	:";
@@ -128,12 +130,29 @@ void list_test()
 	std::cout << "Check for early full lists	:";
 	c.insert(++c.begin(), c.begin(), c.end());
 	d.insert(++d.begin(), d.begin(), d.end());
-	check_list_size_and_value(a, b);
+
+	check_list_size_and_value(c, d);
+
 	std::cout << "Remove				:";
 	a.remove(130);
 	b.remove(130);
 	check_list_size_and_value(a, b);
-	// show_value(a);
+
+	std::cout << "Resize less			:";
+	a.resize(50);
+	b.resize(50);
+	check_list_size_and_value(a, b);
+
+	std::cout << "Resize more			:";
+	r = rand()/21;
+	a.resize(100, r);
+	b.resize(100, r);
+	check_list_size_and_value(a, b);
+
+	std::cout << "Swap				:";
+	a.swap(c);
+	b.swap(d);
+	check_list_size_and_value(a, b);
 	std::cout << "Splice all			:";
 	a.splice(++a.begin(), c);
 	b.splice(++b.begin(), d);
@@ -146,6 +165,11 @@ void list_test()
 	c.erase(c.begin(), c.end());
 	d.erase(d.begin(), d.end());
 	check_list_size_and_value(c, d);
+	std::cout << "Unique					:";
+	a.unique();
+	b.unique();
+	check_list_size_and_value(a, b);
+
 }
 
 int main()

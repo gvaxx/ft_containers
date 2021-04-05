@@ -18,6 +18,10 @@ namespace ft
 		Node	*next;
 		T		value;
 	};
+	template<class value_type>
+	bool equal(value_type const &a, value_type const &b) {
+		return (a == b);
+	}
 } // namespace ft
 
 void print_error(std::string error_string)
