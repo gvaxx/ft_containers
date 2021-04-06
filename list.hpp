@@ -392,7 +392,7 @@ namespace ft {
 
 			void unique()
 			{
-				unique(10);
+				unique(&equal<value_type>);
 			}
 
 			template <class BinaryPredicate>
@@ -403,14 +403,104 @@ namespace ft {
 				for (iterator back = end(); start != back;)
 				{
 					next++;
-					for (; next != back && *start == *next; next++);
+					for (; next != back && binary_pred(*start, *next); next++);
 					if (++start != next) {
 						erase(start, next);
 						start = next;
 					}
 				}
 			}
+			void merge (list& x)
+			{
+				merge(x, &less<value_type>);
+			}
+			
+			template <class Comp>
+			void merge(list& x, Comp comp)
+			{
+				if (&x != this)
+				{
+					iterator start_1 = begin();
+					iterator end_1 = end();
+					iterator start_2 = x.begin();
+					iterator end_2 = x.end();
+					while (start_1 != end_1 && start_2 != end_2)
+					{
+						if (comp(*start_2, *start_1))
+						{
+							size_type insert_size = 1;
+							iterator insert_elements = __next_iterator(start_2);
+							for (; insert_elements != end_2 && comp(*insert_elements, *start_1); ++insert_elements, ++insert_size)
+							;
+							__size += insert_size;
+							x.__size -= insert_size;
+							__node_pointer first = start_2.getNode();
+							__node_pointer last = (insert_elements.getNode())->prev;
+							start_2 = insert_elements;
+							__unlink_nodes(first, last);
+							__link_nodes(start_1.getNode(), first, last);
+							++start_1;
+						}
+						else
+							++start_1;
+					}
+					splice(end_1, x);
+				}
+			}
+
+			void reverse()
+			{
+				if (__size > 1)
+				{
+					for (__node_pointer start = begin().getNode(); start != __end;)
+					{
+						swap_value(start->prev, start->next);
+						start = start->prev;
+					}
+					swap_value(__end->prev, __end->next);
+				}
+			}
+			void sort()
+			{
+				sort(&less<value_type>);
+			}
+			template <class Compare>
+			void sort(Compare comp)
+			{
+				
+				if (__size > 1)
+				{
+					bool had_sorted_value = true;
+					while (had_sorted_value)
+					{
+						had_sorted_value = false;
+						__node_pointer start = (begin().getNode())->next;
+						for (; start != __end;)
+						{
+							if (comp(start->value, start->prev->value)) {
+								had_sorted_value = true;
+								__swap_nodes(start->prev, start);
+								start = start->next;
+							}
+							start = start->next;
+						}
+					}
+				}
+			}
 		private:
+			void __swap_nodes(__node_pointer first, __node_pointer second)
+			{
+				swap_value(first->prev->next, second->next->prev);
+				first->next = second->next;
+				second->prev = first->prev;
+				second->next = first;
+				first->prev = second;
+			}
+			iterator __next_iterator(iterator i)
+			{
+				return ++i;
+			}
+
 			__node_pointer *__insert_node_before_el(__node_pointer *el, const value_type& val = value_type())
 			{
 				__node_pointer *tmp = __create_node(val);

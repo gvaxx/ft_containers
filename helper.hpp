@@ -22,6 +22,10 @@ namespace ft
 	bool equal(value_type const &a, value_type const &b) {
 		return (a == b);
 	}
+	template<class value_type>
+	bool less(value_type const &a, value_type const &b) {
+		return (a < b);
+	}
 } // namespace ft
 
 void print_error(std::string error_string)
