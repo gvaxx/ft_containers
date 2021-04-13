@@ -1,4 +1,3 @@
-
 #ifndef FT_LIST
 #define FT_LIST
 #include <iostream>
@@ -573,60 +572,37 @@ namespace ft {
 	template <class T>
 	bool operator==(const list<T>& lhs, const list<T>& rhs)
 	{
-		if (lhs.size() != rhs.size())
-			return false;
-		unsigned long size = lhs.size();
-		for (unsigned long i = 0; i < size; i++)
-			if (lhs[i] != rhs[i]) 
-				return false;
-		return true;
+		return lhs.size() == rhs.size() && ft::equal(lhs.begin(), lhs.end(), rhs.begin());
 	}
 
 	template <class T>
 	bool operator!=(const list<T>& lhs, const list<T>& rhs)
 	{
-		if (lhs.size() != rhs.size())
-			return true;
-		unsigned long size = lhs.size();
-		for (unsigned long i = 0; i < size; i++)
-			if (lhs[i] == rhs[i]) 
-				return false;
-		return true;
+		return !(lhs == rhs);
 	}
 
 	template <class T>
 	bool operator<(const list<T>& lhs, const list<T>& rhs)
 	{
-		unsigned long size = lhs.size();
-		if (size > rhs.size()) size = rhs.size();
-		for (unsigned long i = 0; i < size; i++)
-			if (lhs[i] != rhs[i])
-				return (lhs[i] < rhs[i]);
-		return lhs.size() < rhs.size();
-	
+		return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 	}
 
 	template <class T>
 	bool operator<=(const list<T>& lhs, const list<T>& rhs)
 	{
-		return (lhs < rhs || lhs == rhs);
+		return !(rhs < lhs);
 	}
 
 	template <class T>
 	bool operator>(const list<T>& lhs, const list<T>& rhs)
 	{
-		unsigned long size = lhs.size();
-		if (size > rhs.size()) size = rhs.size();
-		for (unsigned long i = 0; i < size; i++)
-			if (lhs[i] != rhs[i])
-				return (lhs[i] > rhs[i]);
-		return lhs.size() > rhs.size();
+		return rhs < lhs;
 	}
 
 	template <class T>
 	bool operator>=(const list<T>& lhs, const list<T>& rhs)
 	{
-		return (lhs > rhs || lhs == rhs);
+		return !(lhs < rhs);
 	}
 }
 

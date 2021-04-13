@@ -64,7 +64,39 @@ void vector_test()
 		c.push_back(r / 3);
 		d.push_back(r / 3);
 	}
+	template <class T>
+	bool operator==(const list<T>& lhs, const list<T>& rhs)
+	{
+		return lhs.size() == rhs.size() && equal(lhs.begin(), lhs.end(), rhs.begin());
+	}
+
+	template <class T>
+	bool operator!=(const list<T>& lhs, const list<T>& rhs)
+	{
+		return !(lhs == rhs);
+	}
+
+	template <class T>
+	bool operator<(const list<T>& lhs, const list<T>& rhs)
+	{
+		return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+	}
+
+	template <class T>
+	bool operator<=(const list<T>& lhs, const list<T>& rhs)
+	{
+		return rhs < lhs;
+	}
+
+	template <class T>
+	bool operator>(const list<T>& lhs, const list<T>& rhs)
+	{
+		return rhs < lhs;
+	}
+	std::cout << "Operator >=					:";
+	check_values(a >= c, b >= d);
 	
+
 	std::cout << "Reverse iterator					:";
 	b.assign(c.rbegin(), c.rend());
 	a.assign(d.rbegin(), d.rend());

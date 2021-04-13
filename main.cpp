@@ -98,7 +98,18 @@ void list_test()
 		c.push_front(r / 3);
 		d.push_front(r / 3);
 	}
-
+	std::cout << "Operator ==	:";
+	check_values(a == c, b == d);
+	std::cout << "Operator !=	:";
+	check_values(a != c, b != d);
+	std::cout << "Operator <	:";
+	check_values(a < c, b < d);
+	std::cout << "Operator <=	:";
+	check_values(a <= c, b <= d);
+	std::cout << "Operator >	:";
+	check_values(a > c, b > d);
+	std::cout << "Operator >=	:";
+	check_values(a >= c, b >= d);
 	std::cout << "Check for early full lists	:";
 	check_list_size_and_value(&a, &b);
 	std::cout << "Check for early empty lists	:";
@@ -172,6 +183,10 @@ void list_test()
 	a.swap(c);
 	b.swap(d);
 	check_list_size_and_value(&a, &b);
+	std::cout << "Unique				:";
+	a.unique();
+	b.unique();
+	check_list_size_and_value(&a, &b);
 	std::cout << "Splice all			:";
 	a.splice(++a.begin(), c);
 	b.splice(++b.begin(), d);
@@ -184,10 +199,6 @@ void list_test()
 	c.erase(c.begin(), c.end());
 	d.erase(d.begin(), d.end());
 	check_list_size_and_value(&c, &d);
-	std::cout << "Unique				:";
-	a.unique();
-	b.unique();
-	check_list_size_and_value(&a, &b);
 }
 
 int main()
