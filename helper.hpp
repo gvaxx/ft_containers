@@ -1,6 +1,6 @@
 
 #ifndef FT_HELPER
-#define FT_HELPER
+# define FT_HELPER
 namespace ft
 {
 	template <class T>
@@ -64,4 +64,7 @@ void print_fail()
 {
 	std::cout << "\x1b[31m" << "[FAIL]" << "\x1b[0m" << std::endl;
 }
+
+bool list_test();
+
 #endif

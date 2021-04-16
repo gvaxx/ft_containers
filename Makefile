@@ -5,7 +5,7 @@ RM = rm -rf
 FLAGS = --std=c++98
 
 NAME = containers
-SRC = main.cpp
+SRC = list_test.cpp main.cpp
 OBJ = $(SRC:.cpp=.o)
 HDRS = *.hpp
 all: $(NAME)

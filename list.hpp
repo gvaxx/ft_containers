@@ -54,6 +54,7 @@ namespace ft {
 				while (first != last) {
 					push_back(*first);
 					__size++;
+					first++;
 				}
 			}
 
@@ -261,13 +262,13 @@ namespace ft {
 			void assign(InputIterator first, InputIterator last)
 			{
 				iterator index = begin();
-				iterator end = end();
-				for (; first != last && index != end; ++first, ++index)
+				iterator finish = end();
+				for (; first != last && index != finish; ++first, ++index)
 					*index = *first;
-				if (index == end)
-					insert(end, first, last);
+				if (index == finish)
+					insert(finish, first, last);
 				else
-					erase(index, end);
+					erase(index, finish);
 			}
 
 			void assign(size_type n, const value_type& val)
