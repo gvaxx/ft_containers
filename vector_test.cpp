@@ -53,6 +53,8 @@ void vector_test()
 	std::vector<long> b;
 	std::vector<long> c;
 	ft::vector<long> d;
+	std::vector<long> e;
+	ft::vector<long> f;
 
 	long r;
 	std::cout << "Empty							:";
@@ -64,38 +66,52 @@ void vector_test()
 		c.push_back(r / 3);
 		d.push_back(r / 3);
 	}
-	template <class T>
-	bool operator==(const list<T>& lhs, const list<T>& rhs)
-	{
-		return lhs.size() == rhs.size() && equal(lhs.begin(), lhs.end(), rhs.begin());
-	}
 
-	template <class T>
-	bool operator!=(const list<T>& lhs, const list<T>& rhs)
-	{
-		return !(lhs == rhs);
-	}
+	std::cout << "Operator >=						:";
+	check_values(a >= d, b >= c);
+	std::cout << "Operator <=						:";
+	check_values(a <= d, b <= c);
+	std::cout << "Operator >						:";
+	check_values(b > c, a > d);
+	std::cout << "Operator <						:";
+	check_values(b < c, a < d);
+	std::cout << "Oerator ==						:";
+	check_values(b == c, a == d);
+	std::cout << "Operator != 						:";
+	check_values(b != c, a != d);
+	std::cout << "Operator =						:";
+	check_vectors_size_and_value(f = a, e = b);
 
-	template <class T>
-	bool operator<(const list<T>& lhs, const list<T>& rhs)
-	{
-		return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
-	}
-
-	template <class T>
-	bool operator<=(const list<T>& lhs, const list<T>& rhs)
-	{
-		return rhs < lhs;
-	}
-
-	template <class T>
-	bool operator>(const list<T>& lhs, const list<T>& rhs)
-	{
-		return rhs < lhs;
-	}
-	std::cout << "Operator >=					:";
-	check_values(a >= c, b >= d);
+	std::cout << "Copy constructor					:";
+	std::vector<long> g(b);
+	ft::vector<long> h(a);
+	check_vectors_size_and_value(h, g);
 	
+	std::cout << "Resize							:";
+	g.resize(2);
+	h.resize(2);
+	check_vectors_size_and_value(h, g);
+	
+	std::cout << "Max size						:";
+	check_values(g.max_size(), h.max_size());
+
+	std::cout << "Reserve 2000						:";
+
+	a.reserve(2000);
+	b.reserve(2000);
+	check_values(a.capacity(), b.capacity());
+
+	std::cout << "vector[3]						:";
+	check_values(a[3], b[3]);
+
+	std::cout << "vector.at(8)						:";
+	check_values(a.at(8), b.at(8));
+
+	std::cout << "Front							:";
+	check_values(a.front(), b.front());
+
+	std::cout << "Back							:";
+	check_values(a.back(), b.back());
 
 	std::cout << "Reverse iterator					:";
 	b.assign(c.rbegin(), c.rend());
@@ -115,12 +131,6 @@ void vector_test()
 
 	std::cout << "Push back						:";
 	check_vectors_size_and_value(a, b);
-
-	std::cout << "Front							:";
-	check_values(a.front(), b.front());
-
-	std::cout << "Back							:";
-	check_values(a.back(), b.back());
 
 	std::cout << "Pop back						:";
 	check_vectors_size_and_value(a, b);
@@ -172,28 +182,12 @@ void vector_test()
 	std::cout << "Insert some items from other vector at end pos		:";
 	a.insert(a.end() - 11, c.begin(), c.begin() + 10);
 	b.insert(b.end() - 11, c.begin(), c.begin() + 10);
-
 	check_vectors_size_and_value(a, b);
-
-	std::cout << "Reserve 2000						:";
-
-	a.reserve(2000);
-	b.reserve(2000);
-	check_values(a.capacity(), b.capacity());
-
-	std::cout << "vector[3]						:";
-	check_values(a[3], b[3]);
-
-	std::cout << "vector.at(8)						:";
-	check_values(a.at(8), b.at(8));
 
 	std::cout << "Clear							:";
 	a.clear();
 	b.clear();
 	check_vectors_size_and_value(a, b);
-
-	std::cout << "Max size						:";
-	check_values(a.max_size(), b.max_size());
 
 	std::cout << "Assign iterator						:";
 	a.assign(c.begin(), c.begin() + 10);
@@ -215,13 +209,4 @@ void vector_test()
 	swap(a, d);
 	swap(c, b);
 	check_vectors_size_and_value(a, b);
-
-	std::cout << "> operator						:";
-	check_values(b > c, a > d);
-	std::cout << "< operator						:";
-	check_values(b < c, a < d);
-	std::cout << "== operator						:";
-	check_values(b == c, a == d);
-	std::cout << "!= operator						:";
-	check_values(b != c, a != d);
 }

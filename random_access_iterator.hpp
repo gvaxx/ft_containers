@@ -5,7 +5,7 @@
 
 namespace ft{
 
-    template<typename ValueType>
+    template<class ValueType>
     class RandomAccessIterator: public std::iterator<
         std::random_access_iterator_tag,
         ValueType,
@@ -111,6 +111,11 @@ namespace ft{
 			p = p + n;
 			return (*this);
 		}
+
+		friend RandomAccessIterator		operator+(int n, const RandomAccessIterator &rhs)
+		{
+			return rhs.operator+(n);
+		};
 
 		RandomAccessIterator					&operator-=(int n)
 		{

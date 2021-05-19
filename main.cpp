@@ -1,18 +1,27 @@
+#include "helper.hpp"
+#include <map>
 
-#include <list>
-#include <iostream>
-#include <sstream>
-#include <ctime>
-#include <cstdlib>
+void vector_test();
+void list_test();
+void map_test();
+void queue_test();
+void stack_test();
 
-bool list_test();
 int main()
 {
-	srand(time(0));
-	// vector_test();
-	while(list_test());
-	// std::list<long> b(10, 13);
-	// std::cout << b.size() << std::endl;
-	// b.assign(++b.begin(), b.end());
-	// std::cout << b.size() << std::endl;
+	try {
+		std::cout << "_______vector_______\n";
+		vector_test();
+		// std::cout << "_______list_________\n";
+		// list_test();
+		// std::cout << "_______map__________\n";
+		// map_test();
+		// std::cout << "_______queue________\n";
+		// queue_test();
+		// std::cout << "_______stack________\n";
+		// stack_test(); 
+	} catch(std::string err) {
+		print_error(err);
+	}
+
 }

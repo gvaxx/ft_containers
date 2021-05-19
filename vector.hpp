@@ -4,14 +4,17 @@
 #include <iostream>
 #include <typeinfo>
 #include <limits>
+#include "helper.hpp"
+#include <memory>
 #include "random_access_iterator.hpp"
 #include "helper.hpp"
 
 namespace ft {
-	template <class T >
+	template <class T, class Alloc = std::allocator<T> >
 	class vector {
 	public:
 		typedef T										value_type;
+		typedef Alloc									allocator_type;
 		typedef std::size_t								size_type;
 		typedef std::ptrdiff_t							difference_type;
 		typedef	value_type&								reference;
@@ -19,49 +22,48 @@ namespace ft {
 		typedef	value_type*								pointer;
 		typedef	const value_type*						const_pointer;
 		typedef RandomAccessIterator<T>					iterator;
-		typedef const RandomAccessIterator<T>			const_iterator;
+		typedef RandomAccessIterator<T const>			const_iterator;
 		typedef RandomAccessReverseIterator<T>			reverse_iterator;
-		typedef const RandomAccessReverseIterator<T>	const_reverse_iterator;
+		typedef RandomAccessReverseIterator<T const>	const_reverse_iterator;
 
 		private:
 			value_type				*_array;
 			size_type				_size;
 			size_type				_capacity;
+			allocator_type			_alloc;
 			
 		public:
-			explicit vector(): _array(NULL), _size(0), _capacity(0)
+			explicit vector(const allocator_type& alloc = allocator_type())
+				: _array(NULL), _size(0), _capacity(0), _alloc(alloc)
 			{}
 
 			~vector()
 			{
 				clear();
-				::operator delete(_array);
+				if (_array)
+					_alloc.deallocate(_array, _capacity);
 			}
 
-			explicit vector(size_type n, const value_type& val = value_type())
+			explicit vector(size_type n, const value_type& val = value_type(),
+                 const allocator_type& alloc = allocator_type()): _array(NULL), _size(0), _capacity(0), _alloc(alloc)
 			{
-				reserve(n);
-				for (size_t i = 0; i < n; i++) {
-					new(&_array[i]) value_type(val);
-				}
+				assign(n, val);
 			}
 
 			template <class InputIterator>
-			vector(InputIterator first, InputIterator last)
+			vector(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type())
+				: _array(NULL), _size(0), _capacity(0), _alloc(alloc)
 			{
 				for (; first != last; ++first)
 					push_back(*first);
 			}
 
-			vector(const vector& x): _array(NULL), _size(0), _capacity(0)
+			vector(const vector& x): _array(NULL), _size(x.size()), _capacity(0)
 			{
 				if (x.size())
 				{
 					reserve(x.size());
-					iterator first = x.begin();
-					iterator last = x.end();
-					for (; first != last; ++first)
-						push_back(*first);
+					std::memcpy(_array, x._array, _size * sizeof(value_type));
 				}
 			}
 
@@ -70,11 +72,10 @@ namespace ft {
 				if (this != &x)
 				{
 					clear();
-					reserve(x->size());
-					iterator it_beg = x.begin();
-					iterator it_end = x.end();
-					for (; it_beg != it_end; ++it_beg)
-						push_back(*it_beg);
+					_alloc = x._alloc;
+					reserve(x.size());
+					_size = x.size();
+					std::memcpy(_array, x._array, _size * sizeof(value_type));
 				}
 				return *this;
 			}
@@ -94,7 +95,7 @@ namespace ft {
 
 			size_type max_size() const
 			{
-				return std::numeric_limits<difference_type>::max();
+				return std::min((size_type) std::numeric_limits<difference_type>::max(), std::numeric_limits<size_type>::max() / sizeof(value_type));
 			}
 
 			size_type size() const
@@ -106,10 +107,10 @@ namespace ft {
 			{
 				if (n > _capacity) {
 					size_t new_capacity = (n > _capacity * 2) ? n : _capacity * 2;
-					value_type *tmp = __reserve(new_capacity);
+					value_type *tmp = _alloc.allocate(new_capacity);
 					if (_array) {
 						std::memcpy(tmp, _array, _size * sizeof(value_type));
-						::operator delete(_array);
+						_alloc.deallocate(_array, _capacity);
 					}
 					_array = tmp;
 					_capacity = new_capacity;
@@ -123,7 +124,7 @@ namespace ft {
 
 			const_iterator begin() const
 			{
-				return iterator(&_array[0]);
+				return const_iterator(&_array[0]);
 			}
 
 			iterator end()
@@ -133,7 +134,7 @@ namespace ft {
 
 			const_iterator end() const
 			{
-				return iterator(&_array[_size]);
+				return const_iterator(&_array[_size]);
 			}
 
 			reverse_iterator rbegin()
@@ -161,14 +162,17 @@ namespace ft {
 				return _capacity;
 			}
 
+			size_type capacity() const
+			{
+				return _capacity;
+			}
+
 			void resize(size_type n, value_type val = value_type())
 			{
-				while(n > _size)
+				while (n > _size)
 					push_back(val);
 				if (n < _size) {
-					size_type tmp = _size;
-					_capacity = 1;
-					reserve(n);
+					erase(begin() + n, end());
 				}
 				return ;
 			}
@@ -180,21 +184,29 @@ namespace ft {
 
 			reference operator[] (size_type n)
 			{
+				if (n >= _size)
+					throw std::out_of_range("Vector index out of range");
 				return _array[n];
 			}
 
 			const_reference operator[] (size_type n) const
 			{
+				if (n >= _size)
+					throw std::out_of_range("Vector index out of range");
 				return _array[n];
 			}
 			
 			reference at (size_type n)
 			{
+				if (n >= _size)
+					throw std::out_of_range("Vector index out of range");
 				return _array[n];
 			}
 
 			const_reference at (size_type n) const
 			{
+				if (n >= _size)
+					throw std::out_of_range("Vector index out of range");
 				return _array[n];
 			}
 
@@ -224,11 +236,12 @@ namespace ft {
 					_array[--_size].value_type::~value_type();
 				}
 			}
+
 			iterator insert(iterator position, const value_type& val)
 			{
 				size_type index = position - begin();
 				__move_elems(position, 1);
-				_array[index] = val;
+				new(&_array[index]) value_type(val);
 				return iterator(&_array[index]);
 			}
 
@@ -237,7 +250,7 @@ namespace ft {
 				size_type index = position - begin();
 				__move_elems(position, n);
 				for (size_type i = 0; i < n; i++) {
-					_array[index + i] = val;
+					new(&_array[index + i]) value_type(val);
 				}
 			}
 
@@ -248,10 +261,11 @@ namespace ft {
 				size_type quantity = __distance(first, last);
 				__move_elems(position, quantity);
 				while (first != last) {
-					_array[index++] = *first;
+					new(&_array[index++]) value_type(*first);
 					first++;
 				}
 			}
+
 			template <class InputIterator>
 			void assign(InputIterator first, InputIterator last)
 			{
@@ -264,11 +278,13 @@ namespace ft {
 				clear();
 				insert(begin(), n, val);
 			}
+
 			iterator erase (iterator position)
 			{
 				__move_elems(position + 1, -1);
 				return position;
 			}
+
 			iterator erase (iterator first, iterator last)
 			{
 				__move_elems(last, first - last);
@@ -297,14 +313,14 @@ namespace ft {
 
 					if (_array) {
 						size_t tmp_offset = 0;
-						for (size_t i = 0; i < new_size; i++) {
+						for (size_t i = 0; i < _size; i++) {
 							if (start.getPtr() == &_array[i]) {
 								tmp_offset = offset;
 							}
-							tmp[i + tmp_offset] = _array[i];
+							new(&tmp[i + tmp_offset]) value_type(_array[i]);
 						}
-						::operator delete(_array);
 					}
+					::operator delete(_array);
 					_array = tmp;
 					_capacity = new_capacity;
 				} else {

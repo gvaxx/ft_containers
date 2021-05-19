@@ -3,15 +3,17 @@
 #include <iostream>
 #include <typeinfo>
 #include <limits>
+#include <memory>
 #include "helper.hpp"
 #include "bidirectional_iterator.hpp"
 
 namespace ft {
-	template <class T >
+	template <class T, class Alloc = std::allocator<T> >
 	class list {
 	public:
 		typedef T										value_type;
 		typedef std::size_t								size_type;
+		typedef Alloc									allocator_type;
 		typedef std::ptrdiff_t							difference_type;
 		typedef	value_type&								reference;
 		typedef	const value_type&						const_reference;
@@ -21,26 +23,27 @@ namespace ft {
 		typedef const BidirectionalIterator<T>			const_iterator;
 		typedef BidirectionalReverseIterator<T>			reverse_iterator;
 		typedef const BidirectionalReverseIterator<T>	const_reverse_iterator;
-		typedef Node<T>									__node;
-		typedef __node*									__node_pointer;
 
 		private:
+		typedef Node<T>									__node;
+		typedef __node*									__node_pointer;
 		__node_pointer									__end;
 		size_type										__size;
-			
+		allocator_type									__alloc;
 		public:
-			explicit list()
+			explicit list(const allocator_type& alloc = allocator_type()): __alloc(alloc)
 			{
 				__base_construct();
 			}
 
 			~list()
 			{
-				// clear();
-				// ::operator delete(_array);
+				clear();
+				__destroy_node(__end);
 			}
 
-			explicit list(size_type n, const value_type& val = value_type())
+			explicit list(size_type n, const value_type& val = value_type(),
+				const allocator_type& alloc = allocator_type()) : __alloc(alloc)
 			{
 				__base_construct();
 				for (size_type i = 0 ; i < n; i++)
@@ -48,7 +51,8 @@ namespace ft {
 			}
 
 			template <class InputIterator>
-			list(InputIterator first, InputIterator last)
+			list(InputIterator first, InputIterator last, const allocator_type& alloc = allocator_type())
+				: __alloc(alloc)
 			{
 				__base_construct();
 				while (first != last) {
@@ -58,10 +62,11 @@ namespace ft {
 				}
 			}
 
-			list(const list& x)
+			list(const list& x): __alloc(alloc)
 			{
 				__base_construct();
 				if (!x.empty()) {
+					__alloc = x.__alloc;
 					iterator first = x.begin();
 					iterator last = x.end();
 					for (; first != last; first++)
@@ -122,7 +127,7 @@ namespace ft {
 
 			size_type max_size() const
 			{
-				return std::numeric_limits<difference_type>::max();
+				return std::min((size_type) std::numeric_limits<difference_type>::max(), std::numeric_limits<size_type>::max() / (sizeof(__node)));
 			}
 
 			iterator begin()
@@ -529,7 +534,7 @@ namespace ft {
 
 			__node_pointer __create_node(T value = value_type())
 			{
-				__node_pointer node = new __node;
+				__node_pointer node = new __node();
 				node->value = value;
 				return node;
 			}
@@ -551,8 +556,7 @@ namespace ft {
 
 			void	__destroy_node(__node_pointer node)
 			{
-				node->value.value_type::~value_type();
-				node->__node::~__node();
+				delete node;
 			}
 
 			iterator	__iterator(size_type n)

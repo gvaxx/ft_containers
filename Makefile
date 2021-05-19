@@ -1,30 +1,39 @@
-SHELL = /bin/sh
+TARGET=main
+FLAGS=-Wall -Werror -Wextra -g3 -fsanitize=address -std=c++98
 
-CC = clang++
-RM = rm -rf
-FLAGS = --std=c++98
+SRC=${wildcard ./tests/*.cpp}
+OBJ=${SRC:%.cpp=%.o}
 
-NAME = containers
-SRC = list_test.cpp main.cpp
-OBJ = $(SRC:.cpp=.o)
-HDRS = *.hpp
-all: $(NAME)
+all: ${TARGET}
 
-$(NAME): $(OBJ)
-	@$(CC) $(OBJ) -o $(NAME) $(FLAGS)
-	
-%.o: %.cpp $(HDRS)
-	@$(CC) -c $< -o $@ $(FLAGS)
+./tests/%.o: ./tests/%.cpp
+	clang++ ${FLAGS} -c $< -o $@
+
+${TARGET}: ${OBJ}
+	clang++ ${FLAGS} ${OBJ} -o ${TARGET}
+
+vector: ${TARGET}
+	./${TARGET} vector
+
+list: ${TARGET}
+	./${TARGET} list
+
+map: ${TARGET}
+	./${TARGET} map
+
+stack: ${TARGET}
+	./${TARGET} stack
+
+queue: ${TARGET}
+	./${TARGET} queue
 
 clean:
-	$(RM) $(OBJ)
+	rm -rf *.dSYM
 
 fclean: clean
-	$(RM) $(NAME)
+	rm -rf ${OBJ}
+	rm -rf ${TARGET} ${TARGET}_test
 
 re: fclean all
 
-test: all
-	./$(NAME)
-retest: re test
-.PHONY: all clean fclean re
+.PHONY: all ${TARGET} test
